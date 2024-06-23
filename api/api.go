@@ -35,7 +35,6 @@ func (api *API) setHandler(w http.ResponseWriter, r *http.Request) {
 	value := vars["value"]
 
 	api.cluster.Store.Set(key, value)
-	api.cluster.BroadcastSet(key, value)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Key-Value pair set successfully"))
 

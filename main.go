@@ -10,21 +10,6 @@ import (
 
 func main() {
 
-	// log.Println("starting application")
-	// node := &cluster.Node{Name: "node2", Addr: "localhost:8080"}
-	// log.Println("Node Created")
-	// store := store.NewKeyValueStore()
-	// log.Println("Store Created")
-	// cluster, err := cluster.NewCluster(node, store)
-	// if err != nil {
-	// 	log.Fatalf("Failed to create cluster: %v", err)
-	// }
-
-	// api := api.NewAPI(cluster)
-	// log.Println("API Created")
-	// api.Run(":8081")
-	// log.Println("Started and running")
-
 	nodeName := flag.String("node", "node1", "Name of the node")
 	nodeAddr := flag.String("addr", "127.0.0.1:7946", "Address of the node")
 	apiPort := flag.String("port", ":8081", "Port for the API to listen on")

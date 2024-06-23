@@ -1,11 +1,8 @@
 package cluster
 
 import (
-	"fmt"
 	"key-value-store/store"
 	"log"
-	"net/http"
-	"net/url"
 	"strconv"
 	"strings"
 
@@ -22,24 +19,6 @@ type Cluster struct {
 	LocalNode *Node
 	Store     *store.KeyValueStore
 }
-
-// func NewCluster(LocalNode *Node, store *store.KeyValueStore) (*Cluster, error) {
-// 	config := memberlist.DefaultLocalConfig()
-// 	log.Println("config : ", config)
-// 	config.Name = LocalNode.Name
-// 	config.BindAddr = LocalNode.Addr
-
-// 	list, err := memberlist.Create(config)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return &Cluster{
-// 		Memberlist: list,
-// 		LocalNode:  LocalNode,
-// 		Store:      store,
-// 	}, nil
-// }
 
 func NewCluster(node *Node, store *store.KeyValueStore, clusterAddress string) (*Cluster, error) {
 	config := memberlist.DefaultLocalConfig()
@@ -61,7 +40,7 @@ func NewCluster(node *Node, store *store.KeyValueStore, clusterAddress string) (
 
 	if clusterAddress != "" {
 		addresses := strings.Split(clusterAddress, ",")
-		log.Println(addresses)
+		log.Println(" CLuster addresses : ", addresses)
 		err := cluster.Join(addresses)
 		if err != nil {
 			return nil, err
@@ -74,6 +53,7 @@ func NewCluster(node *Node, store *store.KeyValueStore, clusterAddress string) (
 }
 
 func (c *Cluster) Join(seeds []string) error {
+	log.Println("seeds :", seeds)
 	_, err := c.Memberlist.Join(seeds)
 	if err != nil {
 		log.Printf("Failed to join cluster: %v", err)
@@ -86,21 +66,3 @@ func (c *Cluster) Join(seeds []string) error {
 // func (c *Cluster) NotifyMsg(msg []byte) {
 
 // }
-
-func (c *Cluster) BroadcastSet(key, value string) {
-	for _, member := range c.Members() {
-		if member.Name != c.LocalNode.Name {
-			form := url.Values{}
-			form.Set("key", key)
-			form.Set("value", value)
-			log.Println("address : ", member.Port)
-			url := fmt.Sprintf("http://%s:%s/set", member.Addr, strconv.FormatUint(uint64(member.Port), 10))
-			resp, err := http.PostForm(url, form)
-			if err != nil {
-				log.Printf("Failed to broadcast to member %s: %v", member.Name, err)
-			} else {
-				resp.Body.Close()
-			}
-		}
-	}
-}
